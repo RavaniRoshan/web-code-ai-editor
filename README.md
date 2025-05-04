@@ -1,73 +1,117 @@
-# Welcome to your Lovable project
 
-## Project info
+# Lovable.dev - AI-Powered Code Editor
 
-**URL**: https://lovable.dev/projects/dbe5f230-cc8e-4ce8-81ef-21dd1478bc50
+<div align="center">
+  <img src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b" width="600" alt="Lovable.dev Screenshot">
+  <p><em>Modern web-based code editor with integrated AI assistance</em></p>
+</div>
 
-## How can I edit this code?
+## 🌟 Features
 
-There are several ways of editing your application.
+- **Monaco Editor Integration** - Powered by the same editor engine as VS Code
+- **AI Assistant** - Get intelligent code suggestions, explanations, and help
+- **Interactive UI** - Modern, responsive interface with dark mode
+- **Virtual File System** - Create, edit, and manage files in the browser
+- **AI Workflows** - Step-by-step guidance for complex development tasks
+- **Integrated Terminal** - Run commands directly within the editor
 
-**Use Lovable**
+## 🚀 Demo
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/dbe5f230-cc8e-4ce8-81ef-21dd1478bc50) and start prompting.
+Try the live demo at [https://lovable.dev](https://lovable.dev)
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🛠️ Tech Stack
 
-**Use your preferred IDE**
+- **Frontend**: React, TypeScript, Tailwind CSS
+- **Editor**: Monaco Editor
+- **UI Components**: shadcn/ui
+- **State Management**: React Query
+- **AI Integration**: OpenAI API
+- **Routing**: React Router
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🏗️ Architecture
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+The application follows a component-based architecture with the following key parts:
 
-Follow these steps:
+1. **Core Editor** - Monaco integration with syntax highlighting and IntelliSense
+2. **File Explorer** - Virtual file system for managing project files
+3. **Terminal** - Command execution and output display
+4. **AI Assistant** - AI-powered chat interface for code help
+5. **UI Components** - Reusable UI elements built with shadcn/ui
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🧠 AI Features
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+- **Code Explanations** - Understand complex code with plain English explanations
+- **Refactoring Suggestions** - Get AI recommendations for code improvements
+- **Error Debugging** - Identify and fix bugs with AI assistance
+- **Workflow Guidance** - Step-by-step instructions for implementing features
+- **Context-Aware Help** - AI understands your current file and cursor position
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 📦 Getting Started
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### Prerequisites
+
+- Node.js 18+ and npm
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/lovable-dev/web-code-ai.git
+
+# Navigate to the project directory
+cd web-code-ai
+
+# Install dependencies
+npm install
+
+# Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Configuration
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+To use the AI features, you'll need to set up an API key:
 
-**Use GitHub Codespaces**
+1. Create a `.env` file in the project root
+2. Add your OpenAI API key: `VITE_OPENAI_API_KEY=your_api_key_here`
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 📚 Usage
 
-## What technologies are used for this project?
+1. Launch the application using `npm run dev`
+2. Use the file explorer to create or open files
+3. Write code in the editor
+4. Use the AI assistant for help by clicking the AI button or selecting code and using the context menu
 
-This project is built with:
+### Keyboard Shortcuts
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- `Ctrl+S` - Save current file
+- `Ctrl+P` - Quick file open
+- `Ctrl+Shift+A` - Toggle AI assistant
+- `F1` - Command palette
 
-## How can I deploy this project?
+## 🤝 Contributing
 
-Simply open [Lovable](https://lovable.dev/projects/dbe5f230-cc8e-4ce8-81ef-21dd1478bc50) and click on Share -> Publish.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-## Can I connect a custom domain to my Lovable project?
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-Yes, you can!
+## 📄 License
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## 🙏 Acknowledgments
+
+- [Monaco Editor](https://github.com/microsoft/monaco-editor)
+- [shadcn/ui](https://ui.shadcn.com/)
+- [OpenAI](https://openai.com/)
+- [React](https://reactjs.org/)
+
+---
+
+<div align="center">
+  <p>Built with ❤️ by the Lovable.dev team</p>
+</div>
