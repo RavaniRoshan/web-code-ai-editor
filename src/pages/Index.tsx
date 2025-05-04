@@ -1,18 +1,26 @@
 
 import React, { useState, useEffect } from "react";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import Sidebar from "@/components/Sidebar";
 import Explorer, { FileItem } from "@/components/Explorer";
 import EditorTabs from "@/components/EditorTabs";
 import CodeEditor from "@/components/CodeEditor";
 import AIAssistant from "@/components/AIAssistant";
 import { useToast } from "@/hooks/use-toast";
+import { FileSystemService } from "@/services/fileSystem";
 
 const Index = () => {
   const [activeView, setActiveView] = useState("explorer");
   const [activeFileId, setActiveFileId] = useState<string | null>(null);
   const [openFiles, setOpenFiles] = useState<FileItem[]>([]);
-  const [files, setFiles] = useState<FileItem[]>(sampleFiles);
+  const [files, setFiles] = useState<FileItem[]>([]);
   const { toast } = useToast();
+
+  // Initialize files
+  useEffect(() => {
+    const filesData = FileSystemService.getFiles();
+    setFiles(filesData);
+  }, []);
 
   // Find active file
   const activeFile = openFiles.find(file => file.id === activeFileId) || null;
@@ -51,19 +59,61 @@ const Index = () => {
       prev.map(file => file.id === fileId ? { ...file, content: newContent } : file)
     );
     
-    // Helper function to update nested files
-    const updateFileContent = (items: FileItem[]): FileItem[] => {
-      return items.map(item => {
-        if (item.id === fileId) {
-          return { ...item, content: newContent };
-        } else if (item.children) {
-          return { ...item, children: updateFileContent(item.children) };
-        }
-        return item;
-      });
-    };
+    // Update the file content in the file system
+    FileSystemService.updateFileContent(fileId, newContent);
     
-    setFiles(updateFileContent(files));
+    // Update the UI state
+    const updatedFiles = [...files];
+    setFiles(updatedFiles);
+  };
+
+  // File operations
+  const handleCreateFile = (parentId: string, name: string) => {
+    const newFile = FileSystemService.createFile(parentId, name);
+    if (newFile) {
+      // Update the UI state
+      const updatedFiles = [...files];
+      setFiles(updatedFiles);
+    }
+  };
+
+  const handleCreateFolder = (parentId: string, name: string) => {
+    const newFolder = FileSystemService.createFolder(parentId, name);
+    if (newFolder) {
+      // Update the UI state
+      const updatedFiles = [...files];
+      setFiles(updatedFiles);
+    }
+  };
+
+  const handleRenameItem = (id: string, newName: string) => {
+    const renamedItem = FileSystemService.renameItem(id, newName);
+    if (renamedItem) {
+      // Update the UI state
+      const updatedFiles = [...files];
+      setFiles(updatedFiles);
+      
+      // If the renamed item is open, update it in openFiles
+      if (openFiles.some(file => file.id === id)) {
+        setOpenFiles(prev => 
+          prev.map(file => file.id === id ? { ...file, name: newName } : file)
+        );
+      }
+    }
+  };
+
+  const handleDeleteItem = (id: string) => {
+    const deleted = FileSystemService.deleteItem(id);
+    if (deleted) {
+      // Update the UI state
+      const updatedFiles = [...files];
+      setFiles(updatedFiles);
+      
+      // If the deleted item is open, close it
+      if (openFiles.some(file => file.id === id)) {
+        handleCloseFile(id);
+      }
+    }
   };
 
   // Mock save function
@@ -102,6 +152,10 @@ const Index = () => {
             files={files} 
             onSelectFile={handleSelectFile} 
             selectedFileId={activeFileId}
+            onCreateFile={handleCreateFile}
+            onCreateFolder={handleCreateFolder}
+            onRenameItem={handleRenameItem}
+            onDeleteItem={handleDeleteItem}
           />
         </div>
       )}
@@ -121,60 +175,33 @@ const Index = () => {
           onCloseFile={handleCloseFile}
         />
         
-        <div className="flex-1 overflow-hidden">
-          <CodeEditor 
-            file={activeFile}
-            onCodeChange={handleCodeChange}
-          />
-        </div>
+        <ResizablePanelGroup direction="vertical" className="flex-1">
+          <ResizablePanel defaultSize={75} minSize={30}>
+            <div className="h-full overflow-hidden">
+              <CodeEditor 
+                file={activeFile}
+                onCodeChange={handleCodeChange}
+              />
+            </div>
+          </ResizablePanel>
+          
+          <ResizableHandle withHandle />
+          
+          <ResizablePanel defaultSize={25} minSize={10}>
+            <div className="h-full overflow-auto bg-editor-panel border-t border-gray-800 p-2">
+              <div className="flex items-center border-b border-gray-800 pb-2 mb-2">
+                <h3 className="text-sm font-medium">Terminal / Console</h3>
+              </div>
+              <div className="font-mono text-xs text-gray-400">
+                <p>> Project loaded successfully</p>
+                <p>> Ready for development</p>
+              </div>
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </div>
     </div>
   );
 };
-
-// Sample files data
-const sampleFiles: FileItem[] = [
-  {
-    id: "root",
-    name: "my-project",
-    type: "folder",
-    children: [
-      {
-        id: "src",
-        name: "src",
-        type: "folder",
-        children: [
-          {
-            id: "app-js",
-            name: "App.js",
-            type: "file",
-            language: "javascript",
-            content: `import React from 'react';\n\nfunction App() {\n  return (\n    <div className="App">\n      <h1>Hello World!</h1>\n      <p>Welcome to my React app</p>\n    </div>\n  );\n}\n\nexport default App;`,
-          },
-          {
-            id: "styles-css",
-            name: "styles.css",
-            type: "file",
-            language: "css",
-            content: `body {\n  margin: 0;\n  padding: 0;\n  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,\n    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;\n}\n\n.App {\n  text-align: center;\n  padding: 2rem;\n}`,
-          }
-        ]
-      },
-      {
-        id: "index-html",
-        name: "index.html",
-        type: "file",
-        language: "html",
-        content: `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>My Web App</title>\n  <link rel="stylesheet" href="src/styles.css">\n</head>\n<body>\n  <div id="root"></div>\n  <script src="src/index.js"></script>\n</body>\n</html>`,
-      },
-      {
-        id: "readme-md",
-        name: "README.md",
-        type: "file",
-        content: `# My Project\n\nThis is a sample README file for the project.\n\n## Getting Started\n\nTo get started with this project:\n\n1. Clone the repository\n2. Install dependencies: \`npm install\`\n3. Start the development server: \`npm start\`\n\n## Features\n\n- Feature 1\n- Feature 2\n- Feature 3`,
-      }
-    ]
-  }
-];
 
 export default Index;

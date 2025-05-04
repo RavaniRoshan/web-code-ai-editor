@@ -19,3 +19,18 @@ export interface EditorOptions {
   tabSize?: number;
   theme?: string;
 }
+
+// Monaco editor related types
+export interface MonacoTheme {
+  base: string;
+  inherit: boolean;
+  rules: any[];
+  colors: Record<string, string>;
+}
+
+export interface EditorState {
+  value: string;
+  language: string;
+  modelPath?: string;
+}
+
