@@ -193,8 +193,9 @@ const Index = () => {
                 <h3 className="text-sm font-medium">Terminal / Console</h3>
               </div>
               <div className="font-mono text-xs text-gray-400">
-                <p>> Project loaded successfully</p>
-                <p>> Ready for development</p>
+                {/* Fix: Properly escape ">" characters in JSX */}
+                <p>{"> Project loaded successfully"}</p>
+                <p>{"> Ready for development"}</p>
               </div>
             </div>
           </ResizablePanel>
