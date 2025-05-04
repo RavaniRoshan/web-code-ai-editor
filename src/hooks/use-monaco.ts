@@ -1,18 +1,33 @@
 
 import { useRef, useEffect, useState } from 'react';
-import { editor } from 'monaco-editor';
 import { EditorOptions } from '@/types/editor';
+
+interface MonacoEditor {
+  create: (element: HTMLElement, options: any) => any;
+}
+
+interface Monaco {
+  editor: {
+    create: (element: HTMLElement, options: any) => any;
+  }
+}
+
+declare global {
+  interface Window {
+    monaco?: Monaco;
+  }
+}
 
 export const useMonaco = (options: EditorOptions = {}) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [editorInstance, setEditorInstance] = useState<editor.IStandaloneCodeEditor | null>(null);
+  const [editorInstance, setEditorInstance] = useState<any | null>(null);
   
   useEffect(() => {
     if (!containerRef.current) return;
     
     // Monaco editor is loaded asynchronously, so we need to check if it's available
     if (typeof window !== 'undefined' && window.monaco) {
-      const defaultOptions: editor.IEditorOptions = {
+      const defaultOptions = {
         automaticLayout: true,
         scrollBeyondLastLine: false,
         minimap: options.minimap || { enabled: true },
@@ -24,7 +39,6 @@ export const useMonaco = (options: EditorOptions = {}) => {
         },
         lineNumbers: options.lineNumbers || 'on',
         readOnly: options.readOnly || false,
-        tabSize: options.tabSize || 2,
         theme: options.theme || 'vs-dark',
       };
 
@@ -40,4 +54,3 @@ export const useMonaco = (options: EditorOptions = {}) => {
 
   return { containerRef, editorInstance };
 };
-

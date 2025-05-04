@@ -6,14 +6,20 @@ import Explorer, { FileItem } from "@/components/Explorer";
 import EditorTabs from "@/components/EditorTabs";
 import CodeEditor from "@/components/CodeEditor";
 import AIAssistant from "@/components/AIAssistant";
+import AIDrawer from "@/components/AIDrawer";
 import { useToast } from "@/hooks/use-toast";
 import { FileSystemService } from "@/services/fileSystem";
+import { MessageSquare } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const [activeView, setActiveView] = useState("explorer");
   const [activeFileId, setActiveFileId] = useState<string | null>(null);
   const [openFiles, setOpenFiles] = useState<FileItem[]>([]);
   const [files, setFiles] = useState<FileItem[]>([]);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [cursorPosition, setCursorPosition] = useState({ line: 0, col: 0 });
+  const [selectedCode, setSelectedCode] = useState<string | undefined>(undefined);
   const { toast } = useToast();
 
   // Initialize files
@@ -65,6 +71,15 @@ const Index = () => {
     // Update the UI state
     const updatedFiles = [...files];
     setFiles(updatedFiles);
+  };
+
+  // Update cursor position and selected code
+  const handleCursorPositionChange = (position: { line: number, col: number }) => {
+    setCursorPosition(position);
+  };
+
+  const handleSelectionChange = (selection: string | undefined) => {
+    setSelectedCode(selection);
   };
 
   // File operations
@@ -181,6 +196,8 @@ const Index = () => {
               <CodeEditor 
                 file={activeFile}
                 onCodeChange={handleCodeChange}
+                onCursorPositionChange={handleCursorPositionChange}
+                onSelectionChange={handleSelectionChange}
               />
             </div>
           </ResizablePanel>
@@ -189,8 +206,16 @@ const Index = () => {
           
           <ResizablePanel defaultSize={25} minSize={10}>
             <div className="h-full overflow-auto bg-editor-panel border-t border-gray-800 p-2">
-              <div className="flex items-center border-b border-gray-800 pb-2 mb-2">
+              <div className="flex items-center justify-between border-b border-gray-800 pb-2 mb-2">
                 <h3 className="text-sm font-medium">Terminal / Console</h3>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setIsDrawerOpen(true)}
+                  className="flex items-center text-xs"
+                >
+                  <MessageSquare size={14} className="mr-1" /> Ask AI
+                </Button>
               </div>
               <div className="font-mono text-xs text-gray-400">
                 {/* Fix: Properly escape ">" characters in JSX */}
@@ -201,6 +226,15 @@ const Index = () => {
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
+
+      {/* AI Assistant Drawer */}
+      <AIDrawer 
+        open={isDrawerOpen} 
+        onOpenChange={setIsDrawerOpen}
+        selectedCode={selectedCode}
+        currentFile={activeFile?.name}
+        cursorPosition={cursorPosition}
+      />
     </div>
   );
 };

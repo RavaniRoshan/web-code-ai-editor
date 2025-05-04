@@ -6,10 +6,18 @@ import { FileItem } from "./Explorer";
 interface CodeEditorProps {
   file: FileItem | null;
   onCodeChange: (fileId: string, newContent: string) => void;
+  onCursorPositionChange?: (position: { line: number, col: number }) => void;
+  onSelectionChange?: (selection: string | undefined) => void;
 }
 
-const CodeEditor: React.FC<CodeEditorProps> = ({ file, onCodeChange }) => {
+const CodeEditor: React.FC<CodeEditorProps> = ({ 
+  file, 
+  onCodeChange,
+  onCursorPositionChange,
+  onSelectionChange
+}) => {
   const [cursorPosition, setCursorPosition] = useState({ line: 0, col: 0 });
+  const [editorInstance, setEditorInstance] = useState<any>(null);
   
   const handleEditorChange = (value: string = "") => {
     if (file) {
@@ -17,14 +25,22 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ file, onCodeChange }) => {
     }
   };
 
-  const handleEditorDidMount = (editor: any) => {
+  const handleEditorDidMount = (editor: any, monaco: any) => {
+    setEditorInstance(editor);
     editor.focus();
     
     editor.onDidChangeCursorPosition((e: any) => {
-      setCursorPosition({
+      const newPosition = {
         line: e.position.lineNumber,
         col: e.position.column
-      });
+      };
+      setCursorPosition(newPosition);
+      onCursorPositionChange?.(newPosition);
+    });
+    
+    editor.onDidChangeCursorSelection((e: any) => {
+      const selection = editor.getModel().getValueInRange(e.selection);
+      onSelectionChange?.(selection.length > 0 ? selection : undefined);
     });
   };
 
@@ -68,7 +84,6 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ file, onCodeChange }) => {
           scrollBeyondLastLine: false,
           wordWrap: "on",
           automaticLayout: true,
-          tabSize: 2,
         }}
       />
       
