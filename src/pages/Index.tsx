@@ -7,7 +7,7 @@ import EditorTabs from "@/components/EditorTabs";
 import CodeEditor from "@/components/CodeEditor";
 import AIAssistant from "@/components/AIAssistant";
 import AIDrawer from "@/components/AIDrawer";
-import TopMenuBar from "@/components/TopMenuBar";
+import { TopMenuBar } from "@/components/TopMenuBar";
 import StatusBar from "@/components/StatusBar";
 import ExplorerHeader from "@/components/ExplorerHeader";
 import Terminal from "@/components/Terminal";
