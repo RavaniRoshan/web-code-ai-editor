@@ -52,6 +52,7 @@ interface TooltipTriggerProps {
   children: React.ReactNode;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
+  asChild?: boolean;
 }
 
 export const TooltipTrigger: React.FC<TooltipTriggerProps> = ({
@@ -73,6 +74,8 @@ interface TooltipContentProps {
   children: React.ReactNode;
   side?: "top" | "right" | "bottom" | "left";
   className?: string;
+  align?: string;
+  hidden?: boolean;
 }
 
 export const TooltipContent: React.FC<TooltipContentProps> = ({
@@ -105,4 +108,9 @@ export const TooltipContent: React.FC<TooltipContentProps> = ({
       {children}
     </div>
   );
+};
+
+// Create a TooltipProvider component to satisfy imports in other files
+export const TooltipProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
+  return <>{children}</>;
 };

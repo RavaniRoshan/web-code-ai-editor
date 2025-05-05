@@ -27,9 +27,9 @@ interface StatusBarProps {
   currentLine: number;
   currentColumn: number;
   language: string;
-  encoding: string = "UTF-8";
-  lineEnding: string = "LF";
-  indentation: string = "Spaces: 4";
+  encoding?: string;
+  lineEnding?: string;
+  indentation?: string;
 }
 
 const StatusBar: React.FC<StatusBarProps> = ({
@@ -37,9 +37,9 @@ const StatusBar: React.FC<StatusBarProps> = ({
   currentLine,
   currentColumn,
   language,
-  encoding,
-  lineEnding,
-  indentation
+  encoding = "UTF-8",
+  lineEnding = "LF",
+  indentation = "Spaces: 4"
 }) => {
   return (
     <div className="h-6 bg-editor-background border-t border-gray-800 flex justify-between text-gray-400">
