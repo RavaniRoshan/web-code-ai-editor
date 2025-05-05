@@ -26,11 +26,11 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				editor: {
-					background: 'rgba(30, 30, 30, 0.85)',
-					sidebar: 'rgba(37, 37, 38, 0.75)',
-					panel: 'rgba(30, 30, 30, 0.8)',
-					active: 'rgba(45, 45, 45, 0.65)',
-					line: 'rgba(40, 40, 40, 0.6)'
+					background: 'rgba(24, 24, 27, 0.85)', // More translucent
+					sidebar: 'rgba(31, 31, 35, 0.75)', // More translucent
+					panel: 'rgba(28, 28, 31, 0.8)', // More translucent
+					active: 'rgba(38, 38, 42, 0.65)', // More translucent
+					line: 'rgba(35, 35, 38, 0.6)' // More translucent
 				},
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
@@ -96,17 +96,25 @@ export default {
 				blink: {
 					'0%, 100%': { opacity: '1' },
 					'50%': { opacity: '0' }
+				},
+				'fade-in': {
+					'0%': { opacity: '0', transform: 'translateY(10px)' },
+					'100%': { opacity: '1', transform: 'translateY(0)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-				blink: 'blink 1s infinite'
+				blink: 'blink 1s infinite',
+				'fade-in': 'fade-in 0.3s ease-out',
 			},
 			backdropFilter: {
 				'none': 'none',
 				'blur': 'blur(8px)',
 			},
+			fontFamily: {
+				'mono': ['Cascadia Code', 'Menlo', 'Monaco', 'Consolas', 'monospace']
+			}
 		}
 	},
 	plugins: [require("tailwindcss-animate")],

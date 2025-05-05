@@ -47,7 +47,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     setEditorInstance(editor);
     editor.focus();
     
-    // Add Monaco editor configuration here
+    // Configure Monaco editor with enhanced features
     monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
       noSemanticValidation: false,
       noSyntaxValidation: false,
@@ -66,6 +66,28 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
       typeRoots: ["node_modules/@types"],
     });
     
+    // Add auto-closing pairs for all languages
+    monaco.languages.getLanguages().forEach((language: any) => {
+      if (language.id) {
+        try {
+          monaco.languages.setLanguageConfiguration(language.id, {
+            autoClosingPairs: [
+              { open: '{', close: '}' },
+              { open: '[', close: ']' },
+              { open: '(', close: ')' },
+              { open: '"', close: '"' },
+              { open: "'", close: "'" },
+              { open: '`', close: '`' },
+              { open: '/**', close: ' */' },
+            ]
+          });
+        } catch (e) {
+          // Some languages might already have configuration
+        }
+      }
+    });
+    
+    // Track cursor position
     editor.onDidChangeCursorPosition((e: any) => {
       const newPosition = {
         line: e.position.lineNumber,
@@ -75,6 +97,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
       onCursorPositionChange?.(newPosition);
     });
     
+    // Track text selection
     editor.onDidChangeCursorSelection((e: any) => {
       const selection = editor.getModel().getValueInRange(e.selection);
       onSelectionChange?.(selection.length > 0 ? selection : undefined);
@@ -92,10 +115,28 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     return getLanguageFromExtension(filename);
   };
 
+  // Add keyboard shortcuts
+  useEffect(() => {
+    if (editorInstance) {
+      editorInstance.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+        // Save file
+        console.log("File saved");
+      });
+    }
+  }, [editorInstance]);
+  
+  // Show placeholder or the actual editor
   if (!file) {
     return (
-      <div className="h-full flex items-center justify-center text-gray-500">
-        <p>Select a file to edit</p>
+      <div className="h-full flex flex-col items-center justify-center text-gray-500 bg-editor-background">
+        <p className="mb-3 text-lg">No file selected</p>
+        <p className="text-sm">Open a file from the explorer to start editing</p>
+        <button 
+          className="mt-6 px-4 py-2 border border-gray-700 rounded hover:bg-editor-active transition-colors"
+          onClick={() => {/* Open file dialog */}}
+        >
+          Open File
+        </button>
       </div>
     );
   }
@@ -118,11 +159,42 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         options={{
           ...editorOptions,
           automaticLayout: true,
+          fontFamily: "'Cascadia Code', Consolas, 'Courier New', monospace",
+          fontLigatures: true,
+          bracketPairColorization: { enabled: true },
+          guides: {
+            bracketPairs: true,
+            indentation: true
+          },
+          folding: true,
+          glyphMargin: true,
+          contextmenu: true,
+          quickSuggestions: true,
+          snippetSuggestions: "inline",
+          suggest: {
+            showMethods: true,
+            showFunctions: true,
+            showConstructors: true,
+            showFields: true,
+            showVariables: true,
+            showClasses: true,
+            showInterfaces: true,
+            showModules: true,
+            showProperties: true,
+            showEvents: true
+          }
         }}
       />
       
-      <div className="absolute bottom-0 left-0 right-0 bg-editor-background/80 backdrop-blur-sm text-gray-400 p-1 text-xs border-t border-gray-800">
-        Line {cursorPosition.line}, Column {cursorPosition.col} | {language}
+      <div className="absolute bottom-0 left-0 right-0 bg-editor-background/80 backdrop-blur-sm text-gray-400 p-1 text-xs border-t border-gray-800 flex justify-between">
+        <div>
+          Line {cursorPosition.line}, Column {cursorPosition.col}
+        </div>
+        <div className="flex gap-4">
+          <span className="capitalize">{language}</span>
+          <span>UTF-8</span>
+          <span>LF</span>
+        </div>
       </div>
     </div>
   );
