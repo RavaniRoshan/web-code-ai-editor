@@ -33,6 +33,7 @@ const AIDrawer: React.FC<AIDrawerProps> = ({
   const [prompt, setPrompt] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [aiMode, setAIMode] = useState<AIMode>("chat");
+  const [selectedModel, setSelectedModel] = useState("gpt-4o");
 
   const handleSubmit = () => {
     setIsSubmitting(true);
@@ -52,7 +53,10 @@ const AIDrawer: React.FC<AIDrawerProps> = ({
           <DrawerHeader>
             <DrawerTitle className="flex items-center justify-between">
               <span>AI Assistant</span>
-              <AIModelSelector />
+              <AIModelSelector 
+                selectedModel={selectedModel} 
+                onModelChange={setSelectedModel} 
+              />
             </DrawerTitle>
             <DrawerDescription className="text-gray-400">
               {selectedCode
