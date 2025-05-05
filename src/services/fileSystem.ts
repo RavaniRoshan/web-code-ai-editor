@@ -1,6 +1,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { FileItem } from "@/components/Explorer";
+import { getLanguageFromExtension, getExtensionFromLanguage } from './languageService';
 
 // File System Storage in memory
 let fileSystemData: FileItem[] = [];
@@ -32,6 +33,13 @@ const initializeFileSystem = (): FileItem[] => {
                 type: "file",
                 language: "css",
                 content: `body {\n  margin: 0;\n  padding: 0;\n  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,\n    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;\n}\n\n.App {\n  text-align: center;\n  padding: 2rem;\n}`,
+              },
+              {
+                id: "python-example",
+                name: "example.py",
+                type: "file",
+                language: "python",
+                content: `# Example Python file\ndef greet(name):\n    return f"Hello, {name}!"\n\nif __name__ == "__main__":\n    print(greet("World"))`,
               }
             ]
           },

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import Sidebar from "@/components/Sidebar";
@@ -9,8 +8,9 @@ import AIAssistant from "@/components/AIAssistant";
 import AIDrawer from "@/components/AIDrawer";
 import { useToast } from "@/hooks/use-toast";
 import { FileSystemService } from "@/services/fileSystem";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   const [activeView, setActiveView] = useState("explorer");
@@ -183,12 +183,23 @@ const Index = () => {
       
       {/* Editor Area */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
-        <EditorTabs 
-          openFiles={openFiles}
-          activeFileId={activeFileId}
-          onSelectFile={handleSelectFileById}
-          onCloseFile={handleCloseFile}
-        />
+        <div className="flex justify-between items-center p-1 border-b border-gray-800">
+          <EditorTabs 
+            openFiles={openFiles}
+            activeFileId={activeFileId}
+            onSelectFile={handleSelectFileById}
+            onCloseFile={handleCloseFile}
+          />
+          <Link to="/marketplace">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="text-xs flex items-center"
+            >
+              <Package size={14} className="mr-1" /> Extensions
+            </Button>
+          </Link>
+        </div>
         
         <ResizablePanelGroup direction="vertical" className="flex-1">
           <ResizablePanel defaultSize={75} minSize={30}>
@@ -221,6 +232,7 @@ const Index = () => {
                 {/* Fix: Properly escape ">" characters in JSX */}
                 <p>{"> Project loaded successfully"}</p>
                 <p>{"> Ready for development"}</p>
+                <p>{"> Monaco editor initialized with extended language support"}</p>
               </div>
             </div>
           </ResizablePanel>

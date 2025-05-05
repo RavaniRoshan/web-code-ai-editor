@@ -3,6 +3,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { Bot, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import AIModelSelector from "./AIModelSelector";
 
 interface Message {
   id: string;
@@ -26,6 +28,7 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ selectedCode }) => {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedModel, setSelectedModel] = useState("gpt-4o");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -34,6 +37,11 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ selectedCode }) => {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleModelChange = (modelId: string) => {
+    setSelectedModel(modelId);
+    toast.success(`Switched to ${modelId} model`);
   };
 
   const handleSend = () => {
@@ -56,7 +64,7 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ selectedCode }) => {
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: generateMockResponse(input),
+        content: generateMockResponse(input, selectedModel),
         timestamp: new Date(),
       };
       
@@ -65,17 +73,20 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ selectedCode }) => {
     }, 1000);
   };
 
-  const generateMockResponse = (query: string): string => {
+  const generateMockResponse = (query: string, model: string): string => {
+    // Simple model-specific responses
+    const modelPrefix = `[${model}]: `;
+    
     if (query.toLowerCase().includes("hello") || query.toLowerCase().includes("hi")) {
-      return "Hello! How can I help you with your coding today?";
+      return `${modelPrefix}Hello! How can I help you with your coding today?`;
     } else if (query.toLowerCase().includes("javascript")) {
-      return "JavaScript is a versatile programming language commonly used for web development. What specific aspect of JavaScript are you interested in learning about?";
+      return `${modelPrefix}JavaScript is a versatile programming language commonly used for web development. What specific aspect of JavaScript are you interested in learning about?`;
     } else if (query.toLowerCase().includes("react")) {
-      return "React is a popular JavaScript library for building user interfaces. It uses a component-based architecture and virtual DOM for efficient rendering. Would you like me to explain a specific React concept?";
+      return `${modelPrefix}React is a popular JavaScript library for building user interfaces. It uses a component-based architecture and virtual DOM for efficient rendering. Would you like me to explain a specific React concept?`;
     } else if (query.toLowerCase().includes("function") || query.toLowerCase().includes("code")) {
-      return "Here's a simple example function:\n```javascript\nfunction greet(name) {\n  return `Hello, ${name}!`;\n}\n```\nYou can call this function with `greet('World')` to get 'Hello, World!'";
+      return `${modelPrefix}Here's a simple example function:\n\`\`\`javascript\nfunction greet(name) {\n  return \`Hello, \${name}!\`;\n}\n\`\`\`\nYou can call this function with \`greet('World')\` to get 'Hello, World!'`;
     } else {
-      return "I'm here to help with your coding questions. Could you provide more details about what you're trying to accomplish?";
+      return `${modelPrefix}I'm here to help with your coding questions. Could you provide more details about what you're trying to accomplish?`;
     }
   };
 
@@ -88,9 +99,15 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ selectedCode }) => {
 
   return (
     <div className="flex flex-col h-full bg-editor-panel">
-      <div className="p-3 border-b border-gray-800 flex items-center">
-        <Bot size={18} className="mr-2 text-blue-400" />
-        <h3 className="text-sm font-medium">AI Assistant</h3>
+      <div className="p-3 border-b border-gray-800 flex items-center justify-between">
+        <h3 className="text-sm font-medium flex items-center">
+          <Bot size={18} className="mr-2 text-blue-400" />
+          AI Assistant
+        </h3>
+        <AIModelSelector
+          selectedModel={selectedModel}
+          onModelChange={handleModelChange}
+        />
       </div>
       
       <div className="flex-1 overflow-auto p-4">

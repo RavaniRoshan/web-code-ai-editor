@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Editor from "@monaco-editor/react";
 import { FileItem } from "./Explorer";
+import { getLanguageFromExtension } from "@/services/languageService";
 
 interface CodeEditorProps {
   file: FileItem | null;
@@ -29,6 +30,25 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     setEditorInstance(editor);
     editor.focus();
     
+    // Add Monaco editor configuration here
+    monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+      noSemanticValidation: false,
+      noSyntaxValidation: false,
+    });
+    
+    monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+      target: monaco.languages.typescript.ScriptTarget.ES2020,
+      allowNonTsExtensions: true,
+      moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+      module: monaco.languages.typescript.ModuleKind.CommonJS,
+      noEmit: true,
+      esModuleInterop: true,
+      jsx: monaco.languages.typescript.JsxEmit.React,
+      reactNamespace: "React",
+      allowJs: true,
+      typeRoots: ["node_modules/@types"],
+    });
+    
     editor.onDidChangeCursorPosition((e: any) => {
       const newPosition = {
         line: e.position.lineNumber,
@@ -45,18 +65,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   };
 
   const getLanguageFromFilename = (filename: string) => {
-    const ext = filename.split('.').pop()?.toLowerCase();
-    switch (ext) {
-      case 'js': return 'javascript';
-      case 'jsx': return 'javascript';
-      case 'ts': return 'typescript';
-      case 'tsx': return 'typescript';
-      case 'html': return 'html';
-      case 'css': return 'css';
-      case 'json': return 'json';
-      case 'md': return 'markdown';
-      default: return 'plaintext';
-    }
+    return getLanguageFromExtension(filename);
   };
 
   if (!file) {
@@ -84,6 +93,11 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
           scrollBeyondLastLine: false,
           wordWrap: "on",
           automaticLayout: true,
+          renderLineHighlight: "all",
+          suggestOnTriggerCharacters: true,
+          acceptSuggestionOnCommitCharacter: true,
+          tabSize: 2,
+          autoIndent: "full"
         }}
       />
       

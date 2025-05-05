@@ -1,8 +1,8 @@
-
 import React, { useState } from "react";
 import { File, FileCode, Folder, ChevronRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import FileOperations from "./FileOperations";
+import { getIconForLanguage } from "@/services/languageService";
 
 export interface FileItem {
   id: string;
@@ -50,14 +50,9 @@ const FileTreeItem: React.FC<FolderProps> = ({
       return isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />;
     }
     
-    if (item.language === "javascript" || item.language === "jsx") {
-      return <FileCode size={16} className="text-yellow-400" />;
-    } else if (item.language === "typescript" || item.language === "tsx") {
-      return <FileCode size={16} className="text-blue-400" />;
-    } else if (item.language === "css") {
-      return <FileCode size={16} className="text-purple-400" />;
-    } else if (item.language === "html") {
-      return <FileCode size={16} className="text-orange-400" />;
+    if (item.language) {
+      const iconClass = getIconForLanguage(item.language);
+      return <FileCode size={16} className={iconClass} />;
     }
     
     return <File size={16} />;
