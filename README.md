@@ -17,7 +17,7 @@
 
 ## 🚀 Demo
 
-Try the live demo at [https://markcode-ide.dev](https://web-code-ai-editor.vercel.app/)
+Try the live demo at [https://markcode-ide.dev](https://markcode-ai-editor.vercel.app/)
 
 ## 🛠️ Tech Stack
 
