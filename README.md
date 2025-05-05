@@ -1,8 +1,8 @@
 
-# Lovable.dev - AI-Powered Code Editor
+# Markcode IDE - AI-Powered Code Editor
 
 <div align="center">
-  <img src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b" width="600" alt="Lovable.dev Screenshot">
+  <img src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b" width="600" alt="Markcode IDE Screenshot">
   <p><em>Modern web-based code editor with integrated AI assistance</em></p>
 </div>
 
@@ -17,7 +17,7 @@
 
 ## 🚀 Demo
 
-Try the live demo at [https://lovable.dev](https://lovable.dev)
+Try the live demo at [https://markcode-ide.dev](https://markcode-ide.dev)
 
 ## 🛠️ Tech Stack
 
@@ -56,10 +56,10 @@ The application follows a component-based architecture with the following key pa
 
 ```bash
 # Clone the repository
-git clone https://github.com/lovable-dev/web-code-ai.git
+git clone https://github.com/RavaniRoshan/web-code-ai-editor.git
 
 # Navigate to the project directory
-cd web-code-ai
+cd web-code-ai-editor
 
 # Install dependencies
 npm install
@@ -113,5 +113,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ---
 
 <div align="center">
-  <p>Built with ❤️ by the Lovable.dev team</p>
+  <p>Built with ❤️ by the Markcode IDE team</p>
 </div>

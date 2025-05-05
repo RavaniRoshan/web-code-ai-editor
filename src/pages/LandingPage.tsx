@@ -12,13 +12,13 @@ const LandingPage = () => {
         <div className="container mx-auto px-4 py-6 flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <Code size={28} className="text-blue-400" />
-            <h1 className="text-2xl font-bold">Lovable.dev</h1>
+            <h1 className="text-2xl font-bold">Markcode IDE</h1>
           </div>
           <div className="flex items-center space-x-4">
             <a href="#features" className="text-sm hover:text-blue-400 transition">Features</a>
             <a href="#demo" className="text-sm hover:text-blue-400 transition">Live Demo</a>
             <a href="#tech" className="text-sm hover:text-blue-400 transition">Tech Stack</a>
-            <a href="https://github.com/lovable-dev/web-code-ai" target="_blank" rel="noopener noreferrer" className="text-sm hover:text-blue-400 transition flex items-center">
+            <a href="https://github.com/RavaniRoshan/web-code-ai-editor" target="_blank" rel="noopener noreferrer" className="text-sm hover:text-blue-400 transition flex items-center">
               <Github size={16} className="mr-1" />
               GitHub
             </a>
@@ -46,7 +46,7 @@ const LandingPage = () => {
               </Link>
             </Button>
             <Button variant="outline" size="lg" asChild>
-              <a href="https://github.com/lovable-dev/web-code-ai" target="_blank" rel="noopener noreferrer">
+              <a href="https://github.com/RavaniRoshan/web-code-ai-editor" target="_blank" rel="noopener noreferrer">
                 <Github size={16} className="mr-1" /> Star on GitHub
               </a>
             </Button>
@@ -55,7 +55,7 @@ const LandingPage = () => {
           <div className="mt-16 rounded-lg overflow-hidden border border-gray-800 shadow-2xl">
             <img 
               src="https://images.unsplash.com/photo-1498050108023-c5249f4df085" 
-              alt="Lovable.dev Editor Interface"
+              alt="Markcode IDE Editor Interface"
               className="w-full"
             />
           </div>
@@ -198,7 +198,7 @@ const LandingPage = () => {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Ready to Start Coding?</h2>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-10">
-            Try Lovable.dev now and experience the future of web-based development.
+            Try Markcode IDE now and experience the future of web-based development.
           </p>
           
           <Button size="lg" asChild>
@@ -215,20 +215,20 @@ const LandingPage = () => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center mb-4 md:mb-0">
               <Code size={20} className="text-blue-400 mr-2" />
-              <h2 className="text-lg font-bold">Lovable.dev</h2>
+              <h2 className="text-lg font-bold">Markcode IDE</h2>
             </div>
             
             <div className="flex space-x-8">
               <a href="#features" className="text-sm text-gray-400 hover:text-blue-400 transition">Features</a>
               <a href="#demo" className="text-sm text-gray-400 hover:text-blue-400 transition">Demo</a>
               <a href="#tech" className="text-sm text-gray-400 hover:text-blue-400 transition">Tech Stack</a>
-              <a href="https://github.com/lovable-dev/web-code-ai" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-400 hover:text-blue-400 transition">
+              <a href="https://github.com/RavaniRoshan/web-code-ai-editor" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-400 hover:text-blue-400 transition">
                 GitHub
               </a>
             </div>
             
             <div className="mt-4 md:mt-0">
-              <p className="text-sm text-gray-500">© 2025 Lovable.dev. All rights reserved.</p>
+              <p className="text-sm text-gray-500">© 2025 Markcode IDE. All rights reserved.</p>
             </div>
           </div>
         </div>
