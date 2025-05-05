@@ -18,6 +18,17 @@ export interface EditorOptions {
   fontSize?: number;
   tabSize?: number;
   theme?: string;
+  wordWrap?: 'on' | 'off' | 'wordWrapColumn' | 'bounded';
+  autoIndent?: 'none' | 'keep' | 'brackets' | 'advanced' | 'full';
+  cursorBlinking?: 'blink' | 'smooth' | 'phase' | 'expand' | 'solid';
+  cursorStyle?: 'line' | 'block' | 'underline' | 'line-thin' | 'block-outline' | 'underline-thin';
+  scrollBeyondLastLine?: boolean;
+  renderLineHighlight?: 'none' | 'gutter' | 'line' | 'all';
+  suggestOnTriggerCharacters?: boolean;
+  acceptSuggestionOnCommitCharacter?: boolean;
+  formatOnType?: boolean;
+  formatOnPaste?: boolean;
+  formatOnSave?: boolean;
 }
 
 // Monaco editor related types
@@ -33,4 +44,3 @@ export interface EditorState {
   language: string;
   modelPath?: string;
 }
-

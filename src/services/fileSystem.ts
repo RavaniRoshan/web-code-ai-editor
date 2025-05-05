@@ -89,11 +89,26 @@ const generateUniqueFileName = (
   extension?: string
 ): string => {
   const childrenNames = parentFolder.children?.map((c) => c.name) || [];
-  let name = baseName + (extension ? `.${extension}` : "");
+  
+  // Check if baseName already contains an extension
+  const baseNameParts = baseName.split('.');
+  const hasExtension = baseNameParts.length > 1;
+  
+  // Use the specified extension or the one from baseName if it already has one
+  let finalBaseName = baseName;
+  let finalExtension = extension;
+  
+  if (hasExtension && !extension) {
+    // Extract extension from the name if provided in the baseName
+    finalExtension = baseNameParts.pop();
+    finalBaseName = baseNameParts.join('.');
+  }
+  
+  let name = finalBaseName + (finalExtension ? `.${finalExtension}` : "");
   let counter = 1;
 
   while (childrenNames.includes(name)) {
-    name = `${baseName} (${counter})${extension ? `.${extension}` : ""}`;
+    name = `${finalBaseName} (${counter})${finalExtension ? `.${finalExtension}` : ""}`;
     counter++;
   }
 
@@ -125,10 +140,14 @@ export const FileSystemService = {
     if (!parent || parent.type !== "folder") {
       return null;
     }
+    
+    // If the name already has an extension, don't add another one
+    const hasExtension = name.includes('.');
+    const extension = hasExtension ? undefined : getExtensionFromLanguage(language);
 
     const newFile: FileItem = {
       id: uuidv4(),
-      name: generateUniqueFileName(parent, name, getExtensionFromLanguage(language)),
+      name: generateUniqueFileName(parent, name, extension),
       type: "file",
       language,
       content,

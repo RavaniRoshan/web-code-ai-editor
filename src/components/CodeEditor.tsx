@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import Editor from "@monaco-editor/react";
 import { FileItem } from "./Explorer";
 import { getLanguageFromExtension } from "@/services/languageService";
+import EditorSettings from "./EditorSettings";
+import { EditorOptions } from "@/types/editor";
 
 interface CodeEditorProps {
   file: FileItem | null;
@@ -19,6 +21,21 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 }) => {
   const [cursorPosition, setCursorPosition] = useState({ line: 0, col: 0 });
   const [editorInstance, setEditorInstance] = useState<any>(null);
+  const [editorOptions, setEditorOptions] = useState<EditorOptions>({
+    fontSize: 14,
+    minimap: { enabled: true },
+    lineNumbers: 'on',
+    tabSize: 2,
+    theme: 'vs-dark',
+    wordWrap: 'on',
+    scrollBeyondLastLine: false,
+    renderLineHighlight: 'all',
+    suggestOnTriggerCharacters: true,
+    acceptSuggestionOnCommitCharacter: true,
+    autoIndent: 'full',
+    cursorBlinking: 'smooth',
+    cursorStyle: 'line'
+  });
   
   const handleEditorChange = (value: string = "") => {
     if (file) {
@@ -64,6 +81,13 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     });
   };
 
+  const handleOptionsChange = (newOptions: Partial<EditorOptions>) => {
+    setEditorOptions(prev => ({
+      ...prev,
+      ...newOptions
+    }));
+  };
+
   const getLanguageFromFilename = (filename: string) => {
     return getLanguageFromExtension(filename);
   };
@@ -80,28 +104,24 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
   return (
     <div className="relative h-full w-full overflow-hidden">
+      <div className="absolute top-2 right-2 z-10">
+        <EditorSettings options={editorOptions} onOptionsChange={handleOptionsChange} />
+      </div>
+      
       <Editor
         height="calc(100% - 24px)" 
         language={language}
         value={file.content || ""}
-        theme="vs-dark"
+        theme={editorOptions.theme}
         onChange={handleEditorChange}
         onMount={handleEditorDidMount}
         options={{
-          fontSize: 14,
-          minimap: { enabled: true },
-          scrollBeyondLastLine: false,
-          wordWrap: "on",
+          ...editorOptions,
           automaticLayout: true,
-          renderLineHighlight: "all",
-          suggestOnTriggerCharacters: true,
-          acceptSuggestionOnCommitCharacter: true,
-          tabSize: 2,
-          autoIndent: "full"
         }}
       />
       
-      <div className="absolute bottom-0 left-0 right-0 bg-editor-background text-gray-500 p-1 text-xs border-t border-gray-800">
+      <div className="absolute bottom-0 left-0 right-0 bg-editor-background/80 backdrop-blur-sm text-gray-400 p-1 text-xs border-t border-gray-800">
         Line {cursorPosition.line}, Column {cursorPosition.col} | {language}
       </div>
     </div>

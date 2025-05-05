@@ -26,11 +26,11 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				editor: {
-					background: '#1e1e1e',
-					sidebar: '#252526',
-					panel: '#1e1e1e',
-					active: '#2d2d2d',
-					line: '#282828'
+					background: 'rgba(30, 30, 30, 0.85)',
+					sidebar: 'rgba(37, 37, 38, 0.75)',
+					panel: 'rgba(30, 30, 30, 0.8)',
+					active: 'rgba(45, 45, 45, 0.65)',
+					line: 'rgba(40, 40, 40, 0.6)'
 				},
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
@@ -102,7 +102,11 @@ export default {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				blink: 'blink 1s infinite'
-			}
+			},
+			backdropFilter: {
+				'none': 'none',
+				'blur': 'blur(8px)',
+			},
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
