@@ -1,19 +1,23 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import Editor, { useMonaco, DiffEditor } from "@monaco-editor/react";
 import { FileItem } from "@/components/Explorer";
+import { EditorOptions } from "@/types/editor";
 
 interface CodeEditorProps {
   file: FileItem | null;
   onCodeChange: (fileId: string, newContent: string) => void;
   onCursorPositionChange: (position: { line: number, col: number }) => void;
   onSelectionChange: (selection: string | undefined) => void;
+  editorOptions?: EditorOptions;
 }
 
 const CodeEditor: React.FC<CodeEditorProps> = ({ 
   file, 
   onCodeChange,
   onCursorPositionChange,
-  onSelectionChange
+  onSelectionChange,
+  editorOptions = {}
 }) => {
   const monaco = useMonaco();
   const editorRef = useRef<any>(null);
@@ -46,21 +50,33 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     });
   };
 
-  const handleCodeChange = (value: string) => {
-    if (file) {
+  const handleCodeChange = (value: string | undefined) => {
+    if (file && value !== undefined) {
       setCode(value);
       onCodeChange(file.id, value);
     }
   };
 
-  const editorOptions = {
+  // Ensure we use the correct types for wordWrap
+  const editorDefaults = {
     selectOnLineNumbers: true,
     automaticLayout: true,
     scrollBeyondLastLine: false,
-    wordWrap: "on",
-    wrappingIndent: "indent",
+    wordWrap: "on" as "on" | "off" | "wordWrapColumn" | "bounded",
     minimap: {
       enabled: false
+    },
+    fontSize: 14,
+    theme: "vs-dark",
+  };
+
+  // Merge default options with user provided ones
+  const mergedOptions = {
+    ...editorDefaults,
+    ...editorOptions,
+    minimap: {
+      ...editorDefaults.minimap,
+      ...editorOptions?.minimap
     },
   };
 
@@ -74,8 +90,8 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
       width="100%"
       language={file.language || "plaintext"}
       value={code}
-      theme="vs-dark"
-      options={editorOptions}
+      theme={mergedOptions.theme || "vs-dark"}
+      options={mergedOptions}
       onChange={handleCodeChange}
       onMount={handleEditorDidMount}
     />

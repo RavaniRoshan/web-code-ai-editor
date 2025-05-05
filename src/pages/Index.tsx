@@ -19,8 +19,20 @@ import { FileSystemService } from "@/services/fileSystem";
 import { Search, Package, MessageSquare, Terminal as TerminalIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import EditorSettings from "@/components/EditorSettings";
+import { EditorOptions } from "@/types/editor";
 
 const Index = () => {
+  // Editor settings state
+  const [editorOptions, setEditorOptions] = useState<EditorOptions>({
+    wordWrap: "on",
+    minimap: { enabled: false },
+    fontSize: 14,
+    theme: "vs-dark",
+    tabSize: 2,
+    lineNumbers: "on",
+  });
+  
   const [activeView, setActiveView] = useState("explorer");
   const [activeFileId, setActiveFileId] = useState<string | null>(null);
   const [openFiles, setOpenFiles] = useState<FileItem[]>([]);
@@ -206,6 +218,14 @@ const Index = () => {
     }
   };
 
+  // Editor options change handler
+  const handleEditorOptionsChange = (newOptions: Partial<EditorOptions>) => {
+    setEditorOptions((prevOptions) => ({
+      ...prevOptions,
+      ...newOptions,
+    }));
+  };
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -312,15 +332,21 @@ const Index = () => {
                 onSelectFile={handleSelectFileById}
                 onCloseFile={handleCloseFile}
               />
-              <Link to="/marketplace">
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="text-xs flex items-center mr-1"
-                >
-                  <Package size={14} className="mr-1" /> Extensions
-                </Button>
-              </Link>
+              <div className="flex items-center gap-2">
+                <EditorSettings 
+                  options={editorOptions}
+                  onOptionsChange={handleEditorOptionsChange}
+                />
+                <Link to="/marketplace">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="text-xs flex items-center mr-1"
+                  >
+                    <Package size={14} className="mr-1" /> Extensions
+                  </Button>
+                </Link>
+              </div>
             </div>
             
             {/* Editor content area */}
@@ -333,6 +359,7 @@ const Index = () => {
                   onCodeChange={handleCodeChange}
                   onCursorPositionChange={handleCursorPositionChange}
                   onSelectionChange={handleSelectionChange}
+                  editorOptions={editorOptions}
                 />
               )}
             </div>

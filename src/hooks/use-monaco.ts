@@ -40,6 +40,8 @@ export const useMonaco = (options: EditorOptions = {}) => {
         lineNumbers: options.lineNumbers || 'on',
         readOnly: options.readOnly || false,
         theme: options.theme || 'vs-dark',
+        wordWrap: options.wordWrap || 'on',
+        tabSize: options.tabSize || 2,
       };
 
       const editor = window.monaco.editor.create(containerRef.current, defaultOptions);
@@ -51,6 +53,20 @@ export const useMonaco = (options: EditorOptions = {}) => {
       };
     }
   }, [options]);
+
+  // Update editor options when they change
+  useEffect(() => {
+    if (editorInstance) {
+      editorInstance.updateOptions({
+        minimap: options.minimap,
+        fontSize: options.fontSize,
+        lineNumbers: options.lineNumbers,
+        theme: options.theme,
+        wordWrap: options.wordWrap,
+        tabSize: options.tabSize,
+      });
+    }
+  }, [editorInstance, options]);
 
   return { containerRef, editorInstance };
 };
