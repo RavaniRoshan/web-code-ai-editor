@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Bot, X, Plus, Undo, Mic, Attachment, Send } from 'lucide-react';
+import { Bot, X, Plus, Undo, Mic, Paperclip, Send } from 'lucide-react';
 
 interface CopilotChatProps {
   isOpen: boolean;
@@ -84,7 +84,7 @@ const CopilotChat: React.FC<CopilotChatProps> = ({ isOpen, onClose }) => {
           <div className="flex justify-between items-center pt-2">
             <div className="flex gap-1.5">
               <Button variant="ghost" size="icon" className="h-7 w-7 text-gray-400">
-                <Attachment size={14} />
+                <Paperclip size={14} />
               </Button>
               <Button variant="ghost" size="icon" className="h-7 w-7 text-gray-400">
                 <Mic size={14} />

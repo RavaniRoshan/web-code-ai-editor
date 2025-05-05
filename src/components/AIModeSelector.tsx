@@ -16,40 +16,31 @@ const AIModeSelector: React.FC<AIModeSelectorProps> = ({ activeMode, onModeChang
     <TooltipProvider>
       <Tabs value={activeMode} onValueChange={(v) => onModeChange(v as AIMode)} className="w-full">
         <TabsList className="grid grid-cols-3 mb-2 bg-editor-active/50 backdrop-blur-sm">
-          <Tooltip>
+          <Tooltip content="Chat only mode - no code changes">
             <TooltipTrigger asChild>
               <TabsTrigger value="chat" className="flex items-center gap-1 data-[state=active]:bg-editor-background/50">
                 <MessageSquare size={14} />
                 <span className="text-xs">Chat</span>
               </TabsTrigger>
             </TooltipTrigger>
-            <TooltipContent side="bottom" className="bg-editor-background/90 backdrop-blur-sm border-gray-700">
-              <p className="text-xs">Chat only mode - no code changes</p>
-            </TooltipContent>
           </Tooltip>
           
-          <Tooltip>
+          <Tooltip content="AI can make code changes automatically">
             <TooltipTrigger asChild>
               <TabsTrigger value="agent" className="flex items-center gap-1 data-[state=active]:bg-editor-background/50">
                 <Code size={14} />
                 <span className="text-xs">AI Agent</span>
               </TabsTrigger>
             </TooltipTrigger>
-            <TooltipContent side="bottom" className="bg-editor-background/90 backdrop-blur-sm border-gray-700">
-              <p className="text-xs">AI can make code changes automatically</p>
-            </TooltipContent>
           </Tooltip>
           
-          <Tooltip>
+          <Tooltip content="Get suggestions but apply changes manually">
             <TooltipTrigger asChild>
               <TabsTrigger value="manual" className="flex items-center gap-1 data-[state=active]:bg-editor-background/50">
                 <Edit size={14} />
                 <span className="text-xs">Manual</span>
               </TabsTrigger>
             </TooltipTrigger>
-            <TooltipContent side="bottom" className="bg-editor-background/90 backdrop-blur-sm border-gray-700">
-              <p className="text-xs">Get suggestions but apply changes manually</p>
-            </TooltipContent>
           </Tooltip>
         </TabsList>
       </Tabs>
