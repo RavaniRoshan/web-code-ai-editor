@@ -213,49 +213,5 @@ export const FileSystemService = {
   }
 };
 
-// Helper function to determine language based on file extension
-export const getLanguageFromExtension = (fileName: string): string => {
-  const extension = fileName.split('.').pop()?.toLowerCase();
-  
-  switch(extension) {
-    case 'js':
-      return 'javascript';
-    case 'jsx':
-      return 'javascript';
-    case 'ts':
-      return 'typescript';
-    case 'tsx':
-      return 'typescript';
-    case 'html':
-      return 'html';
-    case 'css':
-      return 'css';
-    case 'json':
-      return 'json';
-    case 'md':
-      return 'markdown';
-    default:
-      return 'plaintext';
-  }
-};
-
-// Helper function to get extension from language
-export const getExtensionFromLanguage = (language: string): string => {
-  switch(language) {
-    case 'javascript':
-      return 'js';
-    case 'typescript':
-      return 'ts';
-    case 'html':
-      return 'html';
-    case 'css':
-      return 'css';
-    case 'json':
-      return 'json';
-    case 'markdown':
-      return 'md';
-    default:
-      return 'txt';
-  }
-};
-
+// Note: The helper functions getLanguageFromExtension and getExtensionFromLanguage
+// have been removed from this file as they are now imported from languageService.ts
