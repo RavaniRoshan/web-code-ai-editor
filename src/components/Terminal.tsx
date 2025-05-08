@@ -1,129 +1,181 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { Terminal as TerminalIcon } from "lucide-react";
+import { Terminal as XTerm } from 'xterm';
+import { FitAddon } from 'xterm-addon-fit';
+import 'xterm/css/xterm.css';
 
-const Terminal: React.FC = () => {
-  const [lines, setLines] = useState<string[]>([
-    "Welcome to Web IDE Terminal",
-    "Type 'help' for available commands",
-    "> "
-  ]);
-  const [currentInput, setCurrentInput] = useState("");
-  const [commandHistory, setCommandHistory] = useState<string[]>([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
-  
+interface TerminalProps {
+  workspace?: string;
+  height?: number | string;
+}
+
+const Terminal: React.FC<TerminalProps> = ({ workspace = "default", height = "100%" }) => {
   const terminalRef = useRef<HTMLDivElement>(null);
+  const [terminal, setTerminal] = useState<XTerm | null>(null);
+  const [socket, setSocket] = useState<WebSocket | null>(null);
+  const [fitAddon, setFitAddon] = useState<FitAddon | null>(null);
+  const [connected, setConnected] = useState(false);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      const command = currentInput;
-      
-      // Add command to history
-      if (command.trim()) {
-        setCommandHistory([...commandHistory, command]);
-      }
-      
-      // Process command
-      setLines([...lines.slice(0, -1), `> ${command}`, ...processCommand(command), "> "]);
-      setCurrentInput("");
-      setHistoryIndex(-1);
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      if (historyIndex < commandHistory.length - 1) {
-        const newIndex = historyIndex + 1;
-        setHistoryIndex(newIndex);
-        setCurrentInput(commandHistory[commandHistory.length - 1 - newIndex]);
-      }
-    } else if (e.key === "ArrowDown") {
-      e.preventDefault();
-      if (historyIndex > 0) {
-        const newIndex = historyIndex - 1;
-        setHistoryIndex(newIndex);
-        setCurrentInput(commandHistory[commandHistory.length - 1 - newIndex]);
-      } else if (historyIndex === 0) {
-        setHistoryIndex(-1);
-        setCurrentInput("");
-      }
-    }
-  };
-  
-  const processCommand = (command: string): string[] => {
-    const cmd = command.trim().toLowerCase();
-    
-    if (cmd === "") {
-      return [];
-    } else if (cmd === "help") {
-      return [
-        "Available commands:",
-        "  help     - Show this help message",
-        "  clear    - Clear terminal",
-        "  ls       - List files",
-        "  echo     - Echo text",
-        "  date     - Show current date and time",
-        "  whoami   - Show current user"
-      ];
-    } else if (cmd === "clear") {
-      setTimeout(() => {
-        setLines(["Welcome to Web IDE Terminal", "> "]);
-      }, 0);
-      return [];
-    } else if (cmd === "ls") {
-      return [
-        "src/",
-        "package.json",
-        "README.md",
-        "index.html"
-      ];
-    } else if (cmd.startsWith("echo ")) {
-      return [command.substring(5)];
-    } else if (cmd === "date") {
-      return [new Date().toString()];
-    } else if (cmd === "whoami") {
-      return ["web-ide-user"];
-    } else {
-      return [`Command not found: ${command}. Type 'help' for available commands.`];
-    }
-  };
-  
-  // Auto-scroll to bottom when lines change
+  // Initialize terminal
   useEffect(() => {
-    if (terminalRef.current) {
-      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+    if (terminalRef.current && !terminal) {
+      // Create terminal with FitAddon
+      const term = new XTerm({
+        cursorBlink: true,
+        fontSize: 14,
+        fontFamily: 'Menlo, Monaco, Consolas, monospace',
+        theme: {
+          background: '#1e1e1e',
+          foreground: '#d4d4d4',
+          cursor: '#00ff00',
+          selection: 'rgba(255, 255, 255, 0.3)',
+          black: '#000000',
+          red: '#cd3131',
+          green: '#0dbc79',
+          yellow: '#e5e510',
+          blue: '#2472c8',
+          magenta: '#bc3fbc',
+          cyan: '#11a8cd',
+          white: '#e5e5e5',
+          brightBlack: '#666666',
+          brightRed: '#f14c4c',
+          brightGreen: '#23d18b',
+          brightYellow: '#f5f543',
+          brightBlue: '#3b8eea',
+          brightMagenta: '#d670d6',
+          brightCyan: '#29b8db',
+          brightWhite: '#ffffff'
+        }
+      });
+      
+      const fit = new FitAddon();
+      term.loadAddon(fit);
+      
+      // Open terminal in the container
+      term.open(terminalRef.current);
+      setTerminal(term);
+      setFitAddon(fit);
+      
+      // Connect to WebSocket
+      const wsUrl = new URL(`/terminals/${workspace}`, window.location.href);
+      wsUrl.protocol = wsUrl.protocol.replace('http', 'ws');
+      
+      try {
+        const ws = new WebSocket(wsUrl.href);
+        setSocket(ws);
+        
+        ws.onopen = () => {
+          console.log('Terminal WebSocket connected');
+          setConnected(true);
+          term.writeln('Connected to terminal server');
+        };
+        
+        ws.onmessage = (event) => {
+          try {
+            const message = JSON.parse(event.data);
+            if (message.type === 'output') {
+              term.write(message.content);
+            }
+          } catch (err) {
+            // If it's not JSON, just write it directly
+            term.write(event.data);
+          }
+        };
+        
+        ws.onclose = () => {
+          setConnected(false);
+          term.writeln('\r\nConnection closed. Refresh to reconnect.');
+        };
+        
+        ws.onerror = (error) => {
+          console.error('Terminal WebSocket error:', error);
+          term.writeln('\r\nError connecting to terminal server.');
+        };
+        
+        // Handle terminal input
+        term.onData((data) => {
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'input', content: data }));
+          }
+        });
+        
+        // Handle resize events
+        term.onResize(({ cols, rows }) => {
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'resize', cols, rows }));
+          }
+        });
+        
+        // Initial fit
+        setTimeout(() => {
+          fit.fit();
+        }, 100);
+        
+        // Handle window resize events
+        const handleResize = () => {
+          if (fit) {
+            fit.fit();
+          }
+        };
+        
+        window.addEventListener('resize', handleResize);
+        
+        return () => {
+          window.removeEventListener('resize', handleResize);
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.close();
+          }
+          term.dispose();
+        };
+      } catch (error) {
+        console.error('Failed to connect to terminal server:', error);
+        term.writeln('Failed to connect to terminal server. Server may not be running.');
+        return () => {
+          term.dispose();
+        };
+      }
     }
-  }, [lines]);
+  }, [workspace]);
   
+  // Handle manual resize when panel size changes
+  useEffect(() => {
+    if (fitAddon) {
+      setTimeout(() => {
+        fitAddon.fit();
+      }, 100);
+    }
+  }, [height, fitAddon]);
+  
+  // Fallback terminal content when not connected
+  const renderFallbackContent = () => {
+    return (
+      <div className="p-4 text-gray-400">
+        <p>Terminal server is not connected.</p>
+        <p className="mt-2">Make sure the backend server is running with:</p>
+        <div className="bg-gray-800 p-2 mt-2 rounded">
+          <code>node server/index.js</code>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="flex flex-col h-full bg-editor-panel">
-      <div className="p-3 border-b border-gray-800 flex items-center">
-        <TerminalIcon size={18} className="mr-2 text-green-500" />
-        <h3 className="text-sm font-medium">Terminal</h3>
+      <div className="p-3 border-b border-gray-800 flex items-center justify-between">
+        <div className="flex items-center">
+          <TerminalIcon size={18} className="mr-2 text-green-500" />
+          <h3 className="text-sm font-medium">Terminal</h3>
+        </div>
+        <div className="flex items-center space-x-2">
+          <div className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+          <span className="text-xs">{connected ? 'Connected' : 'Disconnected'}</span>
+        </div>
       </div>
       
-      <div 
-        ref={terminalRef}
-        className="flex-1 overflow-auto p-3 font-mono text-sm"
-        onClick={() => document.getElementById("terminal-input")?.focus()}
-      >
-        {lines.slice(0, -1).map((line, i) => (
-          <div key={i} className="whitespace-pre-wrap mb-1">
-            {line}
-          </div>
-        ))}
-        <div className="flex whitespace-nowrap">
-          {lines[lines.length - 1]}
-          <span 
-            id="terminal-input"
-            className="outline-none"
-            contentEditable
-            suppressContentEditableWarning
-            onKeyDown={handleKeyDown}
-            onInput={(e) => setCurrentInput(e.currentTarget.textContent || "")}
-          >
-            {currentInput}
-          </span>
-          <span className="cursor ml-px"></span>
-        </div>
+      <div className="flex-1 overflow-hidden" style={{ height }}>
+        <div ref={terminalRef} className="h-full"></div>
+        {!connected && !terminal && renderFallbackContent()}
       </div>
     </div>
   );

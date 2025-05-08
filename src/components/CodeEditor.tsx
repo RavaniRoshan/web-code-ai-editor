@@ -1,8 +1,10 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import Editor, { useMonaco, DiffEditor } from "@monaco-editor/react";
+import Editor from "@monaco-editor/react";
 import { FileItem } from "@/components/Explorer";
 import { EditorOptions } from "@/types/editor";
+import { useMonaco } from "@/hooks/use-monaco";
+import { createLanguageClient } from "@/services/lspClient";
 
 interface CodeEditorProps {
   file: FileItem | null;
@@ -19,9 +21,9 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   onSelectionChange,
   editorOptions = {}
 }) => {
-  const monaco = useMonaco();
   const editorRef = useRef<any>(null);
   const [code, setCode] = useState<string>("");
+  const { containerRef, editorInstance, lspClient } = useMonaco(editorOptions, file?.name);
 
   useEffect(() => {
     if (file) {
@@ -48,6 +50,11 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
       const selection = editor.getModel()?.getValueInRange(e.selection);
       onSelectionChange(selection);
     });
+
+    // Initialize language client if file exists
+    if (file) {
+      createLanguageClient(editor, file.name);
+    }
   };
 
   const handleCodeChange = (value: string | undefined) => {

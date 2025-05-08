@@ -1,6 +1,7 @@
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { EditorOptions } from '@/types/editor';
+import { createLanguageClient } from '@/services/lspClient';
 
 interface MonacoEditor {
   create: (element: HTMLElement, options: any) => any;
@@ -18,10 +19,12 @@ declare global {
   }
 }
 
-export const useMonaco = (options: EditorOptions = {}) => {
+export const useMonaco = (options: EditorOptions = {}, fileName?: string) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [editorInstance, setEditorInstance] = useState<any | null>(null);
+  const [lspClient, setLspClient] = useState<any | null>(null);
   
+  // Create editor instance
   useEffect(() => {
     if (!containerRef.current) return;
     
@@ -67,6 +70,21 @@ export const useMonaco = (options: EditorOptions = {}) => {
       });
     }
   }, [editorInstance, options]);
+  
+  // Set up LSP client when editor and filename are available
+  useEffect(() => {
+    if (editorInstance && fileName) {
+      const client = createLanguageClient(editorInstance, fileName);
+      setLspClient(client);
+      
+      return () => {
+        // Clean up LSP client when component unmounts
+        if (client) {
+          client.dispose();
+        }
+      };
+    }
+  }, [editorInstance, fileName]);
 
-  return { containerRef, editorInstance };
+  return { containerRef, editorInstance, lspClient };
 };
