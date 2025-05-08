@@ -1,25 +1,14 @@
 
 import React, { useState, useEffect } from "react";
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
-import Sidebar from "@/components/Sidebar";
-import Explorer, { FileItem } from "@/components/Explorer";
-import EditorTabs from "@/components/EditorTabs";
-import CodeEditor from "@/components/CodeEditor";
-import AIAssistant from "@/components/AIAssistant";
-import AIDrawer from "@/components/AIDrawer";
 import { TopMenuBar } from "@/components/TopMenuBar";
+import Sidebar from "@/components/ui/sidebar";
 import StatusBar from "@/components/StatusBar";
-import ExplorerHeader from "@/components/ExplorerHeader";
-import Terminal from "@/components/Terminal";
-import WelcomePage from "@/components/WelcomePage";
-import CopilotChat from "@/components/CopilotChat";
-import { NewFileDialog, NewFolderDialog, RenameDialog } from "@/components/FileMenus";
+import AIDrawer from "@/components/AIDrawer";
+import EditorLayout from "@/components/EditorLayout";
 import { useToast } from "@/hooks/use-toast";
 import { FileSystemService } from "@/services/fileSystem";
-import { Search, Package, MessageSquare, Terminal as TerminalIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import EditorSettings from "@/components/EditorSettings";
+import { FileItem } from "@/components/Explorer";
+import { NewFileDialog, NewFolderDialog, RenameDialog } from "@/components/FileMenus";
 import { EditorOptions } from "@/types/editor";
 
 const Index = () => {
@@ -226,6 +215,33 @@ const Index = () => {
     }));
   };
 
+  // File creation functions for Explorer interactions
+  const handleCreateFileFromExplorer = (parentId: string) => {
+    const folder = FileSystemService.getItem(parentId);
+    setSelectedFolder(folder as FileItem);
+    setIsNewFileDialogOpen(true);
+  };
+
+  const handleCreateFolderFromExplorer = (parentId: string) => {
+    const folder = FileSystemService.getItem(parentId);
+    setSelectedFolder(folder as FileItem);
+    setIsNewFolderDialogOpen(true);
+  };
+
+  // Helper functions
+  const handleRefreshFiles = () => {
+    const filesData = FileSystemService.getFiles();
+    setFiles(filesData);
+  };
+
+  const handleCollapseAll = () => {
+    toast({
+      title: "Folders collapsed",
+      description: "All folders have been collapsed.",
+      duration: 2000,
+    });
+  };
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -267,128 +283,41 @@ const Index = () => {
           onSaveFile={handleSaveFile}
         />
         
-        <div className="flex flex-grow overflow-hidden">
-          {/* Secondary Panel - Explorer, Terminal, etc */}
-          {activeView === "explorer" && (
-            <div className="w-64 h-full bg-editor-sidebar overflow-hidden flex flex-col border-r border-gray-800">
-              <ExplorerHeader
-                onCreateFile={() => setIsNewFileDialogOpen(true)}
-                onCreateFolder={() => setIsNewFolderDialogOpen(true)}
-                onRefresh={() => {
-                  const filesData = FileSystemService.getFiles();
-                  setFiles(filesData);
-                }}
-                onCollapse={() => {
-                  // Collapse all folders
-                  toast({
-                    title: "Folders collapsed",
-                    description: "All folders have been collapsed.",
-                    duration: 2000,
-                  });
-                }}
-                selectedFolder={selectedFolder}
-              />
-              <div className="flex-grow overflow-auto">
-                <Explorer 
-                  files={files} 
-                  onSelectFile={handleSelectFile} 
-                  selectedFileId={activeFileId}
-                  onCreateFile={(parentId, name) => {
-                    const folder = FileSystemService.getItem(parentId);
-                    setSelectedFolder(folder as FileItem);
-                    setIsNewFileDialogOpen(true);
-                  }}
-                  onCreateFolder={(parentId, name) => {
-                    const folder = FileSystemService.getItem(parentId);
-                    setSelectedFolder(folder as FileItem);
-                    setIsNewFolderDialogOpen(true);
-                  }}
-                  onRenameItem={(id) => {
-                    const item = FileSystemService.getItem(id);
-                    if (item) {
-                      setItemToRename(item);
-                      setIsRenameDialogOpen(true);
-                    }
-                  }}
-                  onDeleteItem={handleDeleteItem}
-                />
-              </div>
-            </div>
-          )}
-          
-          {activeView === "assistant" && (
-            <div className="w-80 h-full border-r border-gray-800">
-              <AIAssistant selectedCode={activeFile?.content} />
-            </div>
-          )}
-          
-          {/* Editor Area */}
-          <div className="flex-1 flex flex-col h-full overflow-hidden">
-            {/* Editor tabs */}
-            <div className="flex justify-between items-center border-b border-gray-800">
-              <EditorTabs 
-                openFiles={openFiles}
-                activeFileId={activeFileId}
-                onSelectFile={handleSelectFileById}
-                onCloseFile={handleCloseFile}
-              />
-              <div className="flex items-center gap-2">
-                <EditorSettings 
-                  options={editorOptions}
-                  onOptionsChange={handleEditorOptionsChange}
-                />
-                <Link to="/marketplace">
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    className="text-xs flex items-center mr-1"
-                  >
-                    <Package size={14} className="mr-1" /> Extensions
-                  </Button>
-                </Link>
-              </div>
-            </div>
-            
-            {/* Editor content area */}
-            <div className="flex-1 overflow-hidden relative">
-              {showWelcome && openFiles.length === 0 ? (
-                <WelcomePage />
-              ) : (
-                <CodeEditor 
-                  file={activeFile}
-                  onCodeChange={handleCodeChange}
-                  onCursorPositionChange={handleCursorPositionChange}
-                  onSelectionChange={handleSelectionChange}
-                  editorOptions={editorOptions}
-                />
-              )}
-            </div>
-            
-            {/* Terminal panel */}
-            <div className="h-64 overflow-hidden flex flex-col border-t border-gray-800">
-              <div className="flex items-center justify-between p-1 border-b border-gray-800">
-                <div className="flex items-center px-2 py-1 text-xs bg-editor-active rounded-t border border-gray-700 border-b-0 relative -mb-px">
-                  <TerminalIcon size={12} className="mr-1" />
-                  <span>Terminal</span>
-                </div>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => setIsDrawerOpen(true)}
-                  className="flex items-center text-xs"
-                >
-                  <MessageSquare size={14} className="mr-1" /> Ask AI
-                </Button>
-              </div>
-              <div className="flex-1">
-                <Terminal />
-              </div>
-            </div>
-          </div>
-          
-          {/* Copilot Chat */}
-          <CopilotChat isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
-        </div>
+        {/* Main Editor Layout */}
+        <EditorLayout 
+          activeView={activeView}
+          files={files}
+          openFiles={openFiles}
+          activeFileId={activeFileId}
+          selectedFolder={selectedFolder}
+          showWelcome={showWelcome}
+          isChatOpen={isChatOpen}
+          isDrawerOpen={isDrawerOpen}
+          editorOptions={editorOptions}
+          onSelectFile={handleSelectFile}
+          onSelectFileById={handleSelectFileById}
+          onCloseFile={handleCloseFile}
+          onCodeChange={handleCodeChange}
+          onCursorPositionChange={handleCursorPositionChange}
+          onSelectionChange={handleSelectionChange}
+          onEditorOptionsChange={handleEditorOptionsChange}
+          onCreateFile={() => setIsNewFileDialogOpen(true)}
+          onCreateFolder={() => setIsNewFolderDialogOpen(true)}
+          onRefreshFiles={handleRefreshFiles}
+          onCollapseAll={handleCollapseAll}
+          onRenameItem={(id) => {
+            const item = FileSystemService.getItem(id);
+            if (item) {
+              setItemToRename(item);
+              setIsRenameDialogOpen(true);
+            }
+          }}
+          onDeleteItem={handleDeleteItem}
+          onCreateFileFromExplorer={handleCreateFileFromExplorer}
+          onCreateFolderFromExplorer={handleCreateFolderFromExplorer}
+          setIsDrawerOpen={setIsDrawerOpen}
+          setIsChatOpen={setIsChatOpen}
+        />
         
         {/* Status Bar */}
         <StatusBar
