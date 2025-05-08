@@ -1,12 +1,9 @@
 import * as monaco from 'monaco-editor';
 import {
   MonacoLanguageClient,
-  CloseAction,
-  ErrorAction,
-  MessageTransports,
-  createProtocolConnection
 } from 'monaco-languageclient';
 import {
+  toSocket,
   WebSocketMessageReader,
   WebSocketMessageWriter
 } from 'vscode-ws-jsonrpc';
@@ -29,31 +26,32 @@ export function createLanguageClient(editor: monaco.editor.IStandaloneCodeEditor
     url.protocol = url.protocol.replace('http', 'ws');
     
     console.log(`Connecting to LSP server for ${language} at ${url.href}`);
-    const webSocket = new WebSocket(url.href);
+    const socket = new WebSocket(url.href);
     
-    webSocket.onopen = () => {
+    socket.onopen = () => {
       console.log(`WebSocket connection established for ${language}`);
     };
     
-    webSocket.onerror = (error) => {
+    socket.onerror = (error) => {
       console.error(`WebSocket error for ${language}:`, error);
     };
     
-    // Create message reader and writer
-    const reader = new WebSocketMessageReader(webSocket);
-    const writer = new WebSocketMessageWriter(webSocket);
+    // Create a proper WebSocket interface that vscode-ws-jsonrpc can use
+    const socketProxy = toSocket(socket);
     
-    // Create connection and client
-    const connection = createProtocolConnection(reader, writer);
+    // Create message reader and writer using the socket proxy
+    const reader = new WebSocketMessageReader(socketProxy);
+    const writer = new WebSocketMessageWriter(socketProxy);
     
     // Start the language client
     const client = new MonacoLanguageClient({
       name: `${language.charAt(0).toUpperCase() + language.slice(1)} Language Client`,
       clientOptions: {
         documentSelector: [language],
+        // Note: The updated API doesn't use ErrorAction and CloseAction enums
         errorHandler: {
-          error: () => ErrorAction.Continue,
-          closed: () => CloseAction.Restart
+          error: () => ({ action: 1 }), // Continue
+          closed: () => ({ action: 1 }) // Restart
         }
       },
       connectionProvider: {
@@ -61,12 +59,12 @@ export function createLanguageClient(editor: monaco.editor.IStandaloneCodeEditor
           return Promise.resolve({
             reader,
             writer
-          } as MessageTransports);
+          });
         }
       }
     });
     
-    // Start the client and add all the registered features
+    // Start the client
     client.start();
     languageClients.set(language, client);
     

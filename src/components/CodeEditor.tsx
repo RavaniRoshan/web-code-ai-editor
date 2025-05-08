@@ -23,7 +23,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 }) => {
   const editorRef = useRef<any>(null);
   const [code, setCode] = useState<string>("");
-  const { containerRef, editorInstance, lspClient } = useMonaco(editorOptions, file?.name);
+  const { containerRef, editorInstance } = useMonaco(editorOptions, file?.name);
 
   useEffect(() => {
     if (file) {
@@ -53,7 +53,11 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
     // Initialize language client if file exists
     if (file) {
-      createLanguageClient(editor, file.name);
+      try {
+        createLanguageClient(editor, file.name);
+      } catch (e) {
+        console.error("Failed to initialize language client:", e);
+      }
     }
   };
 
